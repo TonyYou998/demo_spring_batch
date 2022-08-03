@@ -1,0 +1,15 @@
+version: "3.8"
+services:
+  mysqldb:
+    container_name: spring_batch_demo_db
+    image: mysql:5.7
+    volumes:
+      - mysql-db-springbatch:/var/lib/mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: "1234"
+      MYSQL_DATABASE: "spring_batch_demo"
+    ports:
+      - "4000:3306"
+volumes:
+    mysql-db-springbatch:
+
