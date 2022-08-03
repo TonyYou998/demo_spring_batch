@@ -3,6 +3,8 @@ package com.example.springbatchdemo.Config;
 import com.example.springbatchdemo.Entities.Customer;
 import com.example.springbatchdemo.Repository.CustomerRepository;
 import lombok.AllArgsConstructor;
+import org.springframework.batch.core.Job;
+import org.springframework.batch.core.Step;
 import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
 import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
 import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
@@ -15,6 +17,8 @@ import org.springframework.batch.item.file.transform.DelimitedLineTokenizer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.FileSystemResource;
+import org.springframework.core.task.SimpleAsyncTaskExecutor;
+import org.springframework.core.task.TaskExecutor;
 
 @Configuration
 @EnableBatchProcessing
@@ -56,6 +60,29 @@ public class SpringBatchConfig {
         writer.setRepository(repository);
         writer.setMethodName("save");
         return writer;
+    }
+    @Bean
+    public Step step1(){
+        return  stepBuilderFactory.get("csv-step").<Customer,Customer>chunk(10)
+                .reader(reader())
+                .processor(processor())
+                .writer(writer())
+                .taskExecutor(taskExecutor())
+                .build();
+    }
+    @Bean
+    public Job runJob(){
+        return  jobBuilderFactory.get("impoortCustomers")
+                .flow(step1())
+                .end()
+                .build();
+
+    }
+    @Bean
+    public TaskExecutor taskExecutor(){
+        SimpleAsyncTaskExecutor asyncTaskExecutor=new SimpleAsyncTaskExecutor();
+        asyncTaskExecutor.setConcurrencyLimit(8);
+        return  asyncTaskExecutor;
     }
 
 }

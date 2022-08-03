@@ -1,11 +1,16 @@
 package com.example.springbatchdemo.Entities;
 
+import lombok.*;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
 @Entity
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
 @Table(name="CUSTOMER_INFO")
 public class Customer {
     @Id
